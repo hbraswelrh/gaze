@@ -10,6 +10,18 @@ sources:
     config:
       path: "."
 
+  - id: disk-.github
+    type: disk
+    name: .github
+    config:
+      path: "../.github"
+
+  - id: disk-containerfile
+    type: disk
+    name: containerfile
+    config:
+      path: "../containerfile"
+
   - id: disk-dewey
     type: disk
     name: dewey
@@ -22,11 +34,23 @@ sources:
     config:
       path: "../homebrew-tap"
 
+  - id: disk-intake-kit
+    type: disk
+    name: intake-kit
+    config:
+      path: "../intake-kit"
+
   - id: disk-replicator
     type: disk
     name: replicator
     config:
       path: "../replicator"
+
+  - id: disk-review-council
+    type: disk
+    name: review-council
+    config:
+      path: "../review-council"
 
   - id: disk-unbound-force
     type: disk
@@ -49,16 +73,20 @@ sources:
       recursive: false
 
   # GitHub API (issues, PRs, READMEs)
-  - id: github-jflowers
+  - id: github-yvonnedevlinrh
     type: github
-    name: jflowers org
+    name: yvonnedevlinrh org
     config:
-      org: jflowers
+      org: yvonnedevlinrh
       repos:
         - gaze
+        - .github
+        - containerfile
         - dewey
         - homebrew-tap
+        - intake-kit
         - replicator
+        - review-council
         - unbound-force
         - website
     refresh_interval: daily

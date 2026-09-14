@@ -1,7 +1,7 @@
 ---
 description: Run the reviewer governance council to audit codebase or spec compliance.
 ---
-<!-- scaffolded by uf vdev -->
+<!-- scaffolded by uf v0.17.0 -->
 # Command: /uf.review-council
 
 <protect>

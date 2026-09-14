@@ -2,7 +2,7 @@
 name: pre-flight
 description: "Shared pre-flight skill for CI detection and local tool execution. Supports hard-gate, ci-aware, and soft-gate execution policies."
 ---
-<!-- scaffolded by uf vdev -->
+<!-- scaffolded by uf v0.17.0 -->
 # Skill: Pre-flight Checks
 
 Shared logic for CI workflow detection, local tool

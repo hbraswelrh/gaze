@@ -5,7 +5,7 @@ description: >
   review. One command to wrap up any feature or OpenSpec
   branch.
 ---
-<!-- scaffolded by uf vdev -->
+<!-- scaffolded by uf v0.17.0 -->
 
 # Command: /uf.finale
 

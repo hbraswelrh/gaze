@@ -303,7 +303,7 @@ Tests are organized into two CI suites that run in parallel:
 
 Use `testing.Short()` to guard tests that spawn external `go test` processes or analyze the entire module. These are too slow for the standard CI timeout.
 
-## Architecture
+## Project Structure & Architecture
 
 Single binary CLI with layered internal packages:
 

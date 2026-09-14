@@ -3,7 +3,7 @@ name: always-on-guidance
 description: Global coding rules and tool usage discipline
 tags: [always-on, coding, quality]
 ---
-<!-- scaffolded by uf vdev -->
+<!-- scaffolded by uf v0.17.0 -->
 
 # Always-On Guidance
 
