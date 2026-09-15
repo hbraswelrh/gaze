@@ -68,6 +68,7 @@ gaze analyze ./internal/analysis                    # All exported functions
 gaze analyze -f ParseConfig ./internal/config       # Specific function
 gaze analyze --classify ./internal/analysis         # With classification labels
 gaze analyze --format=json ./internal/analysis      # JSON output
+gaze analyze --format=html ./internal/analysis      # Self-contained HTML report
 ```
 
 For all flags and options, see [`gaze analyze` reference](docs/reference/cli/analyze.md).
@@ -221,7 +222,7 @@ For the full protocol specification (message format, methods, capability negotia
 
 ## Output Formats
 
-The `analyze`, `crap`, `quality`, and `self-check` commands support `--format=text` (default) and `--format=json`.
+The `analyze`, `crap`, `quality`, and `self-check` commands support `--format=text` (default) and `--format=json`. The `analyze` command additionally supports `--format=html`, which produces a self-contained single-file HTML report with inline CSS and native collapsible sections — no network access, JavaScript, or external assets required.
 
 JSON output conforms to documented schemas. Use `gaze schema` to print the analysis report schema. See [JSON Schemas](docs/reference/json-schemas.md) for annotated examples.
 
