@@ -73,11 +73,11 @@ sources:
       recursive: false
 
   # GitHub API (issues, PRs, READMEs)
-  - id: github-yvonnedevlinrh
+  - id: github-unbound-force
     type: github
-    name: yvonnedevlinrh org
+    name: unbound-force org
     config:
-      org: yvonnedevlinrh
+      org: unbound-force
       repos:
         - gaze
         - .github
