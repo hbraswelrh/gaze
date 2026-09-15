@@ -3558,3 +3558,206 @@ func TestAutoDetectMainPkg_AlreadyEnabled(t *testing.T) {
 		t.Error("autoDetectMainPkg unexpectedly disabled includeUnexported")
 	}
 }
+
+// ---------------------------------------------------------------------------
+// runAnalyze --format=html CLI integration tests (task 2.3)
+// ---------------------------------------------------------------------------
+
+// TestRunAnalyze_HTMLFormat_CompleteReport verifies that runAnalyze with
+// format=html emits a complete HTML document for an existing lightweight
+// fixture. This covers the spec scenario "User selects HTML output" at
+// the CLI integration layer.
+func TestRunAnalyze_HTMLFormat_CompleteReport(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	err := runAnalyze(analyzeParams{
+		patterns: []string{"github.com/unbound-force/gaze/internal/analysis/testdata/src/returns"},
+		format:   "html",
+		stdout:   &stdout,
+		stderr:   &stderr,
+	})
+	if err != nil {
+		t.Fatalf("runAnalyze --format=html returned error: %v", err)
+	}
+
+	out := stdout.String()
+
+	// Must be a complete HTML document with doctype and root element.
+	if !strings.Contains(out, "<!DOCTYPE html>") {
+		t.Error("expected <!DOCTYPE html> in HTML output")
+	}
+	if !strings.Contains(out, "<html") {
+		t.Error("expected <html element in HTML output")
+	}
+	if !strings.Contains(out, "</html>") {
+		t.Error("expected closing </html> tag in HTML output")
+	}
+
+	// Must contain the analyzed function from the returns fixture.
+	if !strings.Contains(out, "SingleReturn") {
+		t.Errorf("expected 'SingleReturn' function in HTML output, got:\n%s", out)
+	}
+
+	// Must contain side effect type from the returns fixture.
+	if !strings.Contains(out, "ReturnValue") {
+		t.Errorf("expected 'ReturnValue' effect type in HTML output, got:\n%s", out)
+	}
+
+	// Must contain a version identifier (defaults to the build-time version
+	// or "dev" when unset).
+	if !strings.Contains(out, "Gaze") {
+		t.Error("expected 'Gaze' version identifier in HTML output")
+	}
+
+	// Must use native collapsible sections (spec: Native Collapsible Navigation).
+	if !strings.Contains(out, "<details") {
+		t.Error("expected <details> element for collapsible sections in HTML output")
+	}
+	if !strings.Contains(out, "<summary") {
+		t.Error("expected <summary> element for collapsible sections in HTML output")
+	}
+
+	// Must be self-contained: no external resource references (spec: Self-Contained Output).
+	if strings.Contains(out, "<script src") {
+		t.Error("HTML output must not contain external <script src> elements")
+	}
+	if strings.Contains(out, "<link rel=\"stylesheet\"") {
+		t.Error("HTML output must not contain external <link rel=\"stylesheet\"> elements")
+	}
+}
+
+// TestRunAnalyze_HTMLFormat_WithClassify verifies that the HTML path works
+// when --classify is also set, ensuring the format dispatch does not
+// interfere with classification.
+func TestRunAnalyze_HTMLFormat_WithClassify(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	err := runAnalyze(analyzeParams{
+		patterns: []string{"github.com/unbound-force/gaze/internal/analysis/testdata/src/returns"},
+		format:   "html",
+		classify: true,
+		stdout:   &stdout,
+		stderr:   &stderr,
+	})
+	if err != nil {
+		t.Fatalf("runAnalyze --format=html --classify returned error: %v", err)
+	}
+
+	out := stdout.String()
+	if !strings.Contains(out, "<!DOCTYPE html>") {
+		t.Error("expected complete HTML document with --classify")
+	}
+	if !strings.Contains(out, "SingleReturn") {
+		t.Errorf("expected 'SingleReturn' in classified HTML output")
+	}
+}
+
+// TestRunAnalyze_HTMLFormat_FunctionFilter verifies that the --function
+// filter works correctly with HTML output.
+func TestRunAnalyze_HTMLFormat_FunctionFilter(t *testing.T) {
+	var stdout, stderr bytes.Buffer
+	err := runAnalyze(analyzeParams{
+		patterns: []string{"github.com/unbound-force/gaze/internal/analysis/testdata/src/returns"},
+		format:   "html",
+		function: "SingleReturn",
+		stdout:   &stdout,
+		stderr:   &stderr,
+	})
+	if err != nil {
+		t.Fatalf("runAnalyze --format=html --function=SingleReturn returned error: %v", err)
+	}
+
+	out := stdout.String()
+	if !strings.Contains(out, "SingleReturn") {
+		t.Errorf("expected 'SingleReturn' in filtered HTML output")
+	}
+	if !strings.Contains(out, "</html>") {
+		t.Error("expected complete HTML document with --function filter")
+	}
+}
+
+// TestRunAnalyze_HTMLFormat_Deterministic verifies that identical inputs
+// produce byte-identical HTML output across two independent calls
+// (spec: Deterministic Rendering).
+func TestRunAnalyze_HTMLFormat_Deterministic(t *testing.T) {
+	run := func() string {
+		var stdout, stderr bytes.Buffer
+		err := runAnalyze(analyzeParams{
+			patterns: []string{"github.com/unbound-force/gaze/internal/analysis/testdata/src/returns"},
+			format:   "html",
+			stdout:   &stdout,
+			stderr:   &stderr,
+		})
+		if err != nil {
+			t.Fatalf("runAnalyze --format=html returned error: %v", err)
+		}
+		return stdout.String()
+	}
+
+	first := run()
+	second := run()
+	if first != second {
+		t.Errorf("HTML output is not deterministic: first call produced %d bytes, second produced %d bytes",
+			len(first), len(second))
+	}
+}
+
+// ---------------------------------------------------------------------------
+// Out-of-scope command HTML rejection tests (task 2.3)
+// ---------------------------------------------------------------------------
+
+// TestRunQuality_HTMLFormat_Rejected verifies that runQuality rejects
+// format=html with an invalid-format error, confirming that HTML is
+// not silently accepted by commands that have not implemented it
+// (spec: "Another command selects HTML output").
+func TestRunQuality_HTMLFormat_Rejected(t *testing.T) {
+	err := runQuality(qualityParams{
+		patterns: []string{"github.com/unbound-force/gaze/internal/quality/testdata/src/welltested"},
+		format:   "html",
+		stdout:   &bytes.Buffer{},
+		stderr:   &bytes.Buffer{},
+	})
+	if err == nil {
+		t.Fatal("expected error for format=html on quality command, got nil")
+	}
+	if !strings.Contains(err.Error(), `invalid format "html"`) {
+		t.Errorf("expected invalid format error mentioning html, got: %s", err)
+	}
+}
+
+// TestRunQuality_HTMLFormat_DoesNotFallThroughToText verifies that the
+// quality command does not silently produce text output when html is
+// requested. This guards against a dispatch switch that falls through
+// to the default text case.
+func TestRunQuality_HTMLFormat_DoesNotFallThroughToText(t *testing.T) {
+	var stdout bytes.Buffer
+	err := runQuality(qualityParams{
+		patterns: []string{"github.com/unbound-force/gaze/internal/quality/testdata/src/welltested"},
+		format:   "html",
+		stdout:   &stdout,
+		stderr:   &bytes.Buffer{},
+	})
+	// Must return an error (covered above), but also verify no output was written.
+	if err == nil {
+		t.Fatal("expected error for format=html on quality command")
+	}
+	if stdout.Len() != 0 {
+		t.Errorf("quality command with format=html should not produce stdout output, got %d bytes: %s",
+			stdout.Len(), stdout.String())
+	}
+}
+
+// TestRunCrap_HTMLFormat_Rejected verifies that runCrap also rejects
+// format=html, confirming the per-command opt-in design.
+func TestRunCrap_HTMLFormat_Rejected(t *testing.T) {
+	err := runCrap(crapParams{
+		patterns: []string{"./..."},
+		format:   "html",
+		stdout:   &bytes.Buffer{},
+		stderr:   &bytes.Buffer{},
+	})
+	if err == nil {
+		t.Fatal("expected error for format=html on crap command, got nil")
+	}
+	if !strings.Contains(err.Error(), `invalid format "html"`) {
+		t.Errorf("expected invalid format error mentioning html, got: %s", err)
+	}
+}

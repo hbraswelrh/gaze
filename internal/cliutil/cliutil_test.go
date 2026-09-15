@@ -12,29 +12,56 @@ func TestValidateFormat(t *testing.T) {
 	tests := []struct {
 		name    string
 		format  string
+		extra   []string // optional additional allowed formats
 		wantErr bool
 		errSub  string // substring expected in error message
 	}{
+		// Base set (no extra) - unchanged behavior.
 		{name: "valid text", format: "text", wantErr: false},
 		{name: "valid json", format: "json", wantErr: false},
 		{name: "invalid csv", format: "csv", wantErr: true, errSub: `"csv"`},
 		{name: "empty string", format: "", wantErr: true, errSub: `""`},
 		{name: "error message format", format: "xml", wantErr: true, errSub: "must be 'text' or 'json'"},
+
+		// html rejected without extra - proves D4 scoping.
+		{name: "html rejected without extra", format: "html", wantErr: true, errSub: `"html"`},
+
+		// html accepted when explicitly supplied as extra.
+		{name: "html accepted with extra", format: "html", extra: []string{"html"}, wantErr: false},
+
+		// Base formats still accepted when extra is supplied.
+		{name: "text still valid with extra", format: "text", extra: []string{"html"}, wantErr: false},
+		{name: "json still valid with extra", format: "json", extra: []string{"html"}, wantErr: false},
+
+		// Unsupported format still rejected even with extra.
+		{name: "csv rejected with extra html", format: "csv", extra: []string{"html"}, wantErr: true, errSub: `"csv"`},
+
+		// Error message lists all allowed formats when extra is supplied.
+		{name: "error with extra lists all formats", format: "csv", extra: []string{"html"}, wantErr: true, errSub: "must be 'text', 'json', or 'html'"},
+
+		// Legacy error message preserved when no extra is supplied.
+		{name: "error without extra is legacy text", format: "csv", wantErr: true, errSub: "must be 'text' or 'json'"},
+
+		// Multiple extra values.
+		{name: "second extra accepted", format: "yaml", extra: []string{"html", "yaml"}, wantErr: false},
+
+		// Multiple extra values in error message.
+		{name: "error with two extras lists all", format: "bin", extra: []string{"html", "yaml"}, wantErr: true, errSub: "must be 'text', 'json', 'html', or 'yaml'"},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			err := ValidateFormat(tt.format)
+			err := ValidateFormat(tt.format, tt.extra...)
 			if tt.wantErr {
 				if err == nil {
-					t.Fatalf("ValidateFormat(%q) = nil, want error", tt.format)
+					t.Fatalf("ValidateFormat(%q, %v) = nil, want error", tt.format, tt.extra)
 				}
 				if tt.errSub != "" && !strings.Contains(err.Error(), tt.errSub) {
 					t.Errorf("error %q does not contain %q", err, tt.errSub)
 				}
 			} else {
 				if err != nil {
-					t.Fatalf("ValidateFormat(%q) = %v, want nil", tt.format, err)
+					t.Fatalf("ValidateFormat(%q, %v) = %v, want nil", tt.format, tt.extra, err)
 				}
 			}
 		})
