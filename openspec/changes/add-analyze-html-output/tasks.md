@@ -10,9 +10,23 @@
   tasks run in parallel.
 -->
 
+## Execution Checklist
+
+- [x] Step 0: Startup Cleanup
+- [x] Step 1: Branch Safety Gate
+- [x] Step 2: Resumability Detection
+- [x] Step 3: Clarify (Step 1)
+- [x] Step 4: Plan (Step 2)
+- [x] Step 5: Tasks (Step 3)
+- [x] Step 6: Spec Review (Step 4) -- iteration: 3/3
+- [ ] Step 7: Implement (Step 5) -- phase: 0/5, batch: 0/1, workers: 0/2
+- [ ] Step 8: Code Review (Step 6) -- iteration: 0/3
+- [ ] Step 9: Retrospective (Step 7)
+- [ ] Step 10: Demo (Step 8)
+
 ## 0. Pre-Implementation Gate
 
-- [ ] 0.1 Confirm `proposal.md`, `design.md`, `specs/analyze-html-output/spec.md`, and `tasks.md` are committed and pushed on `opsx/add-analyze-html-output` before modifying production or test code, as required by the repository spec commit gate.
+- [x] 0.1 Confirm `proposal.md`, `design.md`, `specs/analyze-html-output/spec.md`, and `tasks.md` are committed and pushed on `opsx/add-analyze-html-output` before modifying production or test code, as required by the repository spec commit gate.
 
 ## 1. HTML Formatter
 
@@ -42,3 +56,4 @@
 - [ ] 4.5 Re-check the proposal's constitution alignment: the report remains a self-contained collaboration artifact, introduces no mandatory dependency, preserves machine-readable JSON provenance, and is testable without external services.
 - [ ] 4.6 Run the required review council on the final implementation and resolve all REQUEST CHANGES findings before any PR submission; make minimal to no code changes after all four reviewers approve.
 <!-- scaffolded by uf vdev -->
+<!-- spec-review: passed -->

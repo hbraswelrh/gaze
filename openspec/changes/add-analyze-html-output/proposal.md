@@ -36,21 +36,21 @@ This change implements the `gaze analyze` portion of tracking issue #8. HTML out
 
 ## Constitution Alignment
 
-Assessed against the Unbound Force org constitution.
+Assessed against the Gaze project constitution.
 
-### I. Autonomous Collaboration
+### I. Accuracy
 
 **Assessment**: PASS
 
 The generated report is a self-contained artifact that can be exchanged between local development, CI, and reviewers without runtime coupling or an external rendering service.
 
-### II. Composability First
+### II. Minimal Assumptions
 
 **Assessment**: PASS
 
 HTML is an optional output format implemented with the Go standard library. Existing text and JSON modes remain independently usable, and Gaze gains no mandatory service or third-party dependency.
 
-### III. Observable Quality
+### III. Actionable Output
 
 **Assessment**: PASS
 
