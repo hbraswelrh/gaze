@@ -14,7 +14,7 @@ Gaze is a single-binary CLI tool that performs static analysis on Go source code
 | `internal/config/` | Configuration file handling. Loads and validates `.gaze.yaml` files with classification thresholds and other settings. | None (leaf package) |
 | `internal/crap/` | CRAP score computation. Combines cyclomatic complexity with line coverage (CRAP) and contract coverage (GazeCRAP). Quadrant classification, fix strategies, CRAPload counting. | `taxonomy`, `quality`, `analysis`, `classify`, `loader`, `config` |
 | `internal/quality/` | Test quality assessment. Test-target pairing via SSA call graphs, assertion detection, four-pass assertion-to-effect mapping, contract coverage, over-specification scoring. | `taxonomy`, `analysis`, `classify`, `loader`, `config`, `go/ast`, `x/tools/go/ssa` |
-| `internal/report/` | Output formatters for analysis results. JSON and styled text formatters. Embeds the JSON Schema (Draft 2020-12). | `taxonomy`, `lipgloss` |
+| `internal/report/` | Output formatters for analysis results. JSON, styled text, and self-contained analyze HTML formatters. Embeds the JSON Schema (Draft 2020-12) and analyze HTML template. | `taxonomy`, `lipgloss`, `html/template` |
 | `internal/docscan/` | Documentation file scanner. Finds Markdown files in the repository, prioritized by proximity to the target package. | None (leaf package) |
 | `internal/aireport/` | AI-powered CI quality report pipeline. Orchestrates all four analysis operations, pipes JSON to external AI CLIs (Claude, Gemini, Ollama, OpenCode), threshold enforcement, GitHub Step Summary integration. | `taxonomy`, `crap`, `quality`, `analysis`, `classify`, `docscan`, `loader`, `config` |
 | `internal/scaffold/` | OpenCode file scaffolding. Uses `embed.FS` to scaffold agent and command files into user projects via [`gaze init`](../reference/cli/init.md). | None (uses `embed.FS`) |
@@ -76,7 +76,7 @@ The following diagram shows how data flows through Gaze from CLI invocation to o
    - `AnalyzeP1Effects` — globals, writers, channels, HTTP, slices, maps (AST)
    - `AnalyzeP2Effects` — filesystem, database, goroutines, panics, callbacks, logging (AST)
 3. **Classify** (optional, `--classify`): `classify.Classify(results, opts)` runs five signal analyzers on each effect
-4. **Format**: `report.WriteJSON` or `report.WriteText` renders the output
+4. **Format**: `report.WriteJSON`, `report.WriteText`, or the analyze-only `report.WriteHTML` renders the output
 
 ### Step-by-step flow for [`gaze crap`](../reference/cli/crap.md)
 

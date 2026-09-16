@@ -138,8 +138,8 @@ func buildHTMLData(results []taxonomy.AnalysisResult, version string) (*htmlRepo
 }
 
 // tierCSSClass returns the lowercase CSS class suffix for a tier
-// value (e.g., TierP0 -> "p0"). Unknown tiers produce an empty
-// string, which results in the base ".tier" class only.
+// value (e.g., TierP0 -> "p0"). Unknown values are lowercased
+// unchanged and produce a corresponding "tier-<value>" class.
 func tierCSSClass(tier taxonomy.Tier) string {
 	return strings.ToLower(string(tier))
 }
