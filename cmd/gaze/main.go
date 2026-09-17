@@ -207,7 +207,7 @@ func loadConfig(path string, contractualThresh, incidentalThresh int) (*config.G
 
 // runAnalyze is the extracted, testable body of the analyze command.
 func runAnalyze(p analyzeParams) error {
-	if err := cliutil.ValidateFormat(p.format); err != nil {
+	if err := cliutil.ValidateFormat(p.format, "html"); err != nil {
 		return err
 	}
 
@@ -303,6 +303,8 @@ func runAnalyze(p analyzeParams) error {
 	switch p.format {
 	case "json":
 		return report.WriteJSON(p.stdout, allResults, version)
+	case "html":
+		return report.WriteHTML(p.stdout, allResults, version)
 	default:
 		textOpts := report.TextOptions{
 			Classify: p.classify,
@@ -421,7 +423,7 @@ Use /gaze in OpenCode (full mode) for document-enhanced classification.`,
 	cmd.Flags().StringVarP(&function, "function", "f", "",
 		"analyze a specific function (default: all exported)")
 	cmd.Flags().StringVar(&format, "format", "text",
-		"output format: text or json")
+		"output format: text, json, or html")
 	cmd.Flags().BoolVar(&includeUnexported, "include-unexported", false,
 		"include unexported functions")
 	cmd.Flags().BoolVarP(&interactive, "interactive", "i", false,

@@ -22,7 +22,7 @@ At least one package argument is required. Wildcard patterns like `./...` are ex
 
 | Flag | Short | Type | Default | Description |
 |------|-------|------|---------|-------------|
-| `--format` | | `string` | `text` | Output format: `text` or `json` |
+| `--format` | | `string` | `text` | Output format: `text`, `json`, or `html` |
 | `--function` | `-f` | `string` | `""` (all exported) | Analyze a specific function by name |
 | `--include-unexported` | | `bool` | `false` | Include unexported (lowercase) functions in analysis |
 | `--interactive` | `-i` | `bool` | `false` | Launch interactive TUI (Bubble Tea) for browsing results |
@@ -100,6 +100,16 @@ gaze analyze ./internal/crap --format=json | jq '.results[0].side_effects'
 ```
 
 The JSON output conforms to the [Analysis JSON Schema](../json-schemas.md). Use `gaze schema` to print the full schema.
+
+### HTML report saved to a file
+
+```bash
+gaze analyze ./internal/crap --format=html > report.html
+```
+
+Produces a self-contained HTML document with all styling inline. The report uses native `<details>` and `<summary>` elements for collapsible function sections, requires no JavaScript, and loads no external resources — it works offline as a single file. All source-derived content is contextually escaped via Go's `html/template` package. Open `report.html` directly in any browser to browse the results.
+
+> **Note:** HTML output is currently supported only by `gaze analyze`. Other commands (`gaze quality`, `gaze crap`, `gaze report`) continue to accept `text` and `json` only.
 
 ## See Also
 

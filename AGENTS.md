@@ -316,7 +316,7 @@ internal/
   cliutil/             CLI-layer shared helpers (format validation, JSON capture)
   config/              Configuration file handling (.gaze.yaml)
   loader/              Go package loading (go/packages wrapper)
-  report/              Output formatters (JSON, text, HTML stub)
+  report/              Output formatters (JSON, text, HTML)
   crap/                CRAP score computation and reporting
   quality/             Test quality assessment (contract coverage)
   docscan/             Documentation file scanner

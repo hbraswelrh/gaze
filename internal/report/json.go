@@ -1,5 +1,5 @@
 // Package report provides output formatters for Gaze analysis
-// results in JSON and human-readable text formats.
+// results in JSON, human-readable text, and self-contained HTML formats.
 package report
 
 import (

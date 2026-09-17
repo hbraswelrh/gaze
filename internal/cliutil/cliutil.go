@@ -12,13 +12,32 @@ import (
 )
 
 // ValidateFormat checks that format is one of the supported output
-// formats ("text" or "json"). Returns nil if valid, or a descriptive
-// error containing the invalid value.
-func ValidateFormat(format string) error {
-	if format != "text" && format != "json" {
+// formats. The base set is always "text" and "json". Additional
+// formats may be supplied to extend the allowlist for commands that
+// support them (e.g. "html" for analyze). Callers that pass no extra
+// values retain the exact text/json acceptance and error behavior.
+func ValidateFormat(format string, extra ...string) error {
+	if format == "text" || format == "json" {
+		return nil
+	}
+	for _, e := range extra {
+		if format == e {
+			return nil
+		}
+	}
+	if len(extra) == 0 {
 		return fmt.Errorf("invalid format %q: must be 'text' or 'json'", format)
 	}
-	return nil
+	// Build a human-readable list preserving argument order.
+	allowed := "'text', 'json'"
+	for i, e := range extra {
+		if i == len(extra)-1 {
+			allowed += ", or '" + e + "'"
+		} else {
+			allowed += ", '" + e + "'"
+		}
+	}
+	return fmt.Errorf("invalid format %q: must be %s", format, allowed)
 }
 
 // CaptureJSON calls fn with a buffer as the writer, then returns the

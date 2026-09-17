@@ -186,7 +186,7 @@ The signal is automatically included in `ComputeScore` (in `score.go`), which su
 
 ## Adding a New Output Format
 
-Output formatters live in `internal/report/`. Currently supported: JSON (`json.go`) and styled text (`text.go`).
+Output formatters live in `internal/report/`. Currently supported: JSON (`json.go`), styled text (`text.go`), and self-contained HTML for `gaze analyze` (`html.go`).
 
 ### 1. Create the Formatter
 
@@ -216,7 +216,13 @@ Follow the existing pattern:
 
 ### 2. Wire into the CLI
 
-In `cmd/gaze/main.go`, add the new format to the `--format` flag's validation and the output switch:
+In `cmd/gaze/main.go`, pass command-specific formats to `cliutil.ValidateFormat` as additional allowed values, then add the format to the output switch. Commands that do not pass the additional value continue to reject it:
+
+```go
+if err := cliutil.ValidateFormat(p.format, "csv"); err != nil {
+    return err
+}
+```
 
 ```go
 case "csv":
