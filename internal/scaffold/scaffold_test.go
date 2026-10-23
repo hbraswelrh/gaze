@@ -829,6 +829,79 @@ func TestRun_ReScaffoldSingleMarker(t *testing.T) {
 	}
 }
 
+// TestRun_ReScaffoldNonForceSingleMarker verifies the non-force
+// re-init path from issue #279: a second gaze init without --force
+// updates tool-owned files on diff (replacing the old marker) and
+// leaves user-owned files untouched, with no duplicate markers in
+// either case.
+func TestRun_ReScaffoldNonForceSingleMarker(t *testing.T) {
+	dir := t.TempDir()
+
+	if err := os.WriteFile(filepath.Join(dir, "go.mod"), []byte("module test\n"), 0o644); err != nil {
+		t.Fatalf("creating go.mod: %v", err)
+	}
+
+	// First run with version "dev".
+	var buf1 bytes.Buffer
+	_, err := Run(Options{
+		TargetDir: dir,
+		Version:   "dev",
+		Stdout:    &buf1,
+	})
+	if err != nil {
+		t.Fatalf("first Run() returned error: %v", err)
+	}
+
+	// Second run with version "v1.8.0" and no --force: tool-owned
+	// files are updated on diff, user-owned files are skipped.
+	var buf2 bytes.Buffer
+	_, err = Run(Options{
+		TargetDir: dir,
+		Version:   "v1.8.0",
+		Stdout:    &buf2,
+	})
+	if err != nil {
+		t.Fatalf("second Run() returned error: %v", err)
+	}
+
+	paths, err := assetPaths()
+	if err != nil {
+		t.Fatalf("assetPaths() returned error: %v", err)
+	}
+	for _, relPath := range paths {
+		if !strings.HasSuffix(relPath, ".md") {
+			continue
+		}
+		content, err := os.ReadFile(filepath.Join(dir, ".opencode", relPath))
+		if err != nil {
+			t.Fatalf("reading %s: %v", relPath, err)
+		}
+		s := string(content)
+
+		count := strings.Count(s, "<!-- scaffolded by gaze")
+		if count != 1 {
+			t.Errorf("file %s: expected exactly 1 marker, got %d", relPath, count)
+		}
+		if isToolOwned(relPath) {
+			// Updated on diff: new marker present, old marker replaced.
+			if !strings.Contains(s, "<!-- scaffolded by gaze v1.8.0 -->") {
+				t.Errorf("file %s: expected v1.8.0 marker, not found", relPath)
+			}
+			if strings.Contains(s, "gaze dev -->") {
+				t.Errorf("file %s: old dev marker should have been replaced", relPath)
+			}
+		} else {
+			// Skipped: first-run content preserved untouched.
+			if !strings.Contains(s, "<!-- scaffolded by gaze dev -->") {
+				t.Errorf("file %s: expected dev marker (file should be skipped)", relPath)
+			}
+			if strings.Contains(s, "<!-- scaffolded by gaze v1.8.0 -->") {
+				t.Errorf("file %s: user-owned file must not be updated without --force", relPath)
+			}
+		}
+	}
+}
+
 // TestProtectTagPlacement verifies that embedded command files
 // contain correctly placed <protect> tags for DCP context
 // preservation. Asserts tag count per file, balanced pairs, no
