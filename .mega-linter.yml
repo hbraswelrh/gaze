@@ -13,7 +13,10 @@ ENABLE_LINTERS:
 # Exclude spec templates, opencode config, and testdata from linting
 FILTER_REGEX_EXCLUDE: '(\.specify/templates/|\.opencode/|testdata/)'
 
-# Exclude spec markdown files from markdownlint (they use non-standard formatting)
-MARKDOWN_MARKDOWNLINT_FILTER_REGEX_EXCLUDE: '(\.specify/|\.opencode/|specs/)'
+# Exclude spec markdown files from markdownlint (they use non-standard
+# formatting). Embedded asset mirrors are byte-identical copies of
+# .opencode/ sources (TestEmbeddedAssetsMatchSource) and must never be
+# reformatted independently.
+MARKDOWN_MARKDOWNLINT_FILTER_REGEX_EXCLUDE: '(\.specify/|\.opencode/|specs/|internal/scaffold/assets/|internal/aireport/assets/)'
 
 SHOW_ELAPSED_TIME: true
