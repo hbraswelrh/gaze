@@ -17,6 +17,7 @@ invariant documented in AGENTS.md) failed on the PR head.
 ## Goals / Non-Goals
 
 ### Goals
+
 - Idempotent marker insertion: exactly one marker, always the newest version
 - Remove the stale hardcoded `v1.8.0` marker from all embedded assets
 - Make the byte-identical invariant structurally safe under MegaLinter
@@ -24,6 +25,7 @@ invariant documented in AGENTS.md) failed on the PR head.
 - Regression coverage for both force and non-force re-scaffold paths
 
 ### Non-Goals
+
 - Changing marker placement rules (after frontmatter / append)
 - Changing file ownership rules (tool-owned vs user-owned)
 - Replacing the sync-invariant tests with a different mechanism
@@ -33,7 +35,7 @@ invariant documented in AGENTS.md) failed on the PR head.
 ### D1: Strip-then-insert inside `insertMarkerAfterFrontmatter`
 
 A new unexported helper `removeExistingMarker(content []byte) []byte`
-strips every line whose trimmed form starts with `<!-- scaffolded by gaze `
+strips every line whose trimmed form starts with `<!-- scaffolded by gaze`
 and ends with `-->`, and is called as the first step of
 `insertMarkerAfterFrontmatter`.
 

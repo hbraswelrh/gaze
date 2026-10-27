@@ -52,13 +52,16 @@ and scaffold output are otherwise unchanged.
 ## Capabilities
 
 ### New Capabilities
+
 - `scaffold-marker-idempotency` — re-scaffolding replaces the version
   marker in place; embedded assets are lint-invariant mirrors
 
 ### Modified Capabilities
+
 - None
 
 ### Removed Capabilities
+
 - None
 
 ## Impact

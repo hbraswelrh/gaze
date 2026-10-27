@@ -5,7 +5,7 @@
 
 ## 1. Idempotent Marker Insertion
 
-- [x] 1.1 Add `removeExistingMarker(content []byte) []byte` to `internal/scaffold/scaffold.go` — strip every line whose trimmed form starts with `<!-- scaffolded by gaze ` and ends with `-->`. O(n) line scan, no regex.
+- [x] 1.1 Add `removeExistingMarker(content []byte) []byte` to `internal/scaffold/scaffold.go` — strip every line whose trimmed form starts with `<!-- scaffolded by gaze` and ends with `-->`. O(n) line scan, no regex.
 - [x] 1.2 Call `removeExistingMarker` as the first step of `insertMarkerAfterFrontmatter`; update the GoDoc comment to document strip-before-insert.
 
 ## 2. Stale Marker Removal
